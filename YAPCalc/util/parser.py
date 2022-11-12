@@ -1,19 +1,16 @@
 import ast
-import operator
+import string
+import re
 
 class Parser:
 
-    def __init__(self, ops = {
-        ast.Add: operator.add, 
-        ast.Sub: operator.sub, 
-        ast.Mult: operator.mul, 
-        ast.Div: operator.truediv, 
-        ast.Pow: operator.pow,
-    }):
+    def __init__(self, ops):
         self.ops = ops
         
     def calc_expression(self, expression):
-        return self.calc_node(ast.parse(expression, mode = 'eval').body)
+        pexpression = self.prep_expression(expression)
+        parsed_expression = ast.parse(pexpression, mode = 'eval')
+        return self.calc_node(parsed_expression.body)
 
     def calc_node(self, node):
         if isinstance(node, ast.Num):
@@ -22,3 +19,25 @@ class Parser:
             return self.ops[type(node.op)](self.calc_node(node.left), self.calc_node(node.right))
         elif isinstance(node, ast.UnaryOp):
             return self.ops[type(node.op)](self.calc_node(node.operand))
+        else:
+            return "Invalid Expression: " + str(node)
+    
+    def prep_expression(self, expression):
+        pexpression = expression.translate({ord(c): None for c in string.whitespace})
+        if "%" in pexpression:
+            tokens = r"([+*/%-])"
+            tokexpr = re.split(tokens, pexpression)
+            for i in range(len(tokexpr) - 1):
+                if tokexpr[i] == "%" and self.is_float(tokexpr[i+1]):
+                    tokexpr[i+1] = str(float(tokexpr[i+1]) * 0.01)
+                    tokexpr.pop(i)
+            pexpression = ''.join(tokexpr)
+        return pexpression
+
+    def is_float(self, str):
+        try:
+            float(str)
+            return True
+        except ValueError:
+            return False
+
