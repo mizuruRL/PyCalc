@@ -11,9 +11,26 @@ ops = {
         ast.Pow: operator.pow,
     }
 prsr = parser.Parser(ops)
-expr = "0"
 ui = tui.UI()
 
 ui.show_title_screen()
 ui.show_description()
-expr = ui.show_input_space()
+ui.show_help_tip()
+ui.show_quit_tip()
+
+while True:
+    expr = ui.show_input_space()
+    if expr == "help":
+        ui.show_help()
+    elif expr == "quit":
+        ui.show_terminated()
+        exit(0)
+    else:
+        try:
+            pexpr = prsr.prep_expression(expr)
+            print(">", prsr.calc_expression(expr))
+        except TypeError:
+            ui.show_invalid_expression()
+        except SyntaxError:
+            ui.show_invalid_expression()
+        
