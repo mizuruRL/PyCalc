@@ -20,7 +20,7 @@ class Parser:
         elif isinstance(node, ast.UnaryOp):
             return self.ops[type(node.op)](self.calc_node(node.operand))
         else:
-            return "Invalid Expression: " + str(node)
+            raise TypeError
     
     def prep_expression(self, expression):
         pexpression = expression.translate({ord(c): None for c in string.whitespace})
@@ -31,6 +31,8 @@ class Parser:
                 if tokexpr[i] == "%" and self.is_float(tokexpr[i+1]):
                     tokexpr[i+1] = str(float(tokexpr[i+1]) * 0.01)
                     tokexpr.pop(i)
+                else:
+                    raise TypeError
             pexpression = ''.join(tokexpr)
         return pexpression
 
