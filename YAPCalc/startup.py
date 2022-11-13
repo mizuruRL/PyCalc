@@ -28,7 +28,7 @@ while True:
     else:
         try:
             pexpr = prsr.prep_expression(expr)
-            print(">", prsr.calc_expression(expr))
+            print(">", prsr.calc_expression(pexpr))
         except TypeError:
             ui.show_invalid_expression()
         except SyntaxError:
