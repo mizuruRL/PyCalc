@@ -29,10 +29,9 @@ class Parser:
             tokexpr = re.split(tokens, pexpression)
             for i in range(len(tokexpr) - 1):
                 if tokexpr[i] == "%" and self.is_float(tokexpr[i+1]):
+                    print(tokexpr[i])
                     tokexpr[i+1] = str(float(tokexpr[i+1]) * 0.01)
                     tokexpr.pop(i)
-                else:
-                    raise TypeError
             pexpression = ''.join(tokexpr)
         return pexpression
 
