@@ -1,6 +1,8 @@
 import ast
+from math import sqrt
 import string
 import re
+import util.exceptions as pe
 
 class Parser:
 
@@ -9,7 +11,10 @@ class Parser:
         
     def calc_expression(self, expression):
         pexpression = self.prep_expression(expression)
-        parsed_expression = ast.parse(pexpression, mode = 'eval')
+        try:
+            parsed_expression = ast.parse(pexpression, mode = 'eval')
+        except SyntaxError:
+            raise pe.InvalidSyntaxException()
         return self.calc_node(parsed_expression.body)
 
     def calc_node(self, node):
@@ -19,26 +24,42 @@ class Parser:
             return self.ops[type(node.op)](self.calc_node(node.left), self.calc_node(node.right))
         elif isinstance(node, ast.UnaryOp):
             return self.ops[type(node.op)](self.calc_node(node.operand))
+        elif isinstance(node, ast.Name):
+            raise pe.InvalidElementException(str(node.id))
         else:
-            raise TypeError
+            raise pe.InvalidSyntaxException()
     
     def prep_expression(self, expression):
         pexpression = expression.translate({ord(c): None for c in string.whitespace})
         if "%" in pexpression:
             tokens = r"([+*/%-])"
             tokexpr = re.split(tokens, pexpression)
-            for i in range(len(tokexpr) - 1):
-                if tokexpr[i] == "%" and self.is_float(tokexpr[i+1]):
-                    print(tokexpr[i])
-                    tokexpr[i+1] = str(float(tokexpr[i+1]) * 0.01)
-                    tokexpr.pop(i)
+            self.parse_percent(tokexpr)
+            pexpression = ''.join(tokexpr)
+        if "sqrt" in pexpression:
+            tokens = r"(sqrt)"
+            tokexpr = re.split(tokens, pexpression)   
+            self.parse_sqrt(tokexpr)
             pexpression = ''.join(tokexpr)
         return pexpression
 
-    def is_float(self, str):
-        try:
-            float(str)
-            return True
-        except ValueError:
-            return False
+    def parse_percent(self, tokexpr):
+        while "%" in tokexpr:
+            perc_index = tokexpr.index("%")
+            if tokexpr[perc_index - 1] == '':
+                try:
+                    tokexpr[perc_index + 1] = str(float(tokexpr[perc_index + 1]) * 0.01)
+                    tokexpr.pop(perc_index)
+                except ValueError:
+                    raise pe.InvalidExpressionException(''.join(tokexpr[perc_index:]))        
+            else:
+                raise pe.InvalidExpressionException(''.join(tokexpr[perc_index:]))
 
+    def parse_sqrt(self, tokexpr):
+        while "sqrt" in tokexpr:
+            sqrt_index = tokexpr.index("sqrt")
+            try:
+                tokexpr[sqrt_index + 1] = str(sqrt(float(tokexpr[sqrt_index + 1])))
+                tokexpr.pop(sqrt_index)
+            except ValueError:
+                raise pe.InvalidExpressionException(''.join(tokexpr[sqrt_index:])) 

@@ -19,11 +19,7 @@ class UI:
         print("Type quit or press CTRL+C to exit the program.")
 
     def show_input_space(self):
-        try:
-            return input("\n> ")
-        except KeyboardInterrupt:
-            self.show_terminated()
-            exit(0)
+        return input("\n> ")
 
     def show_terminated(self):
         print("Program Terminated.")
@@ -41,11 +37,15 @@ Multiplication (a*b)
 Power (a**b)
 Percentage (a%*b)
 
+Due to limitations, the parser may only apply square roots and percentages to a single number, and not an expression
+> %50*100 is possible, %(20+30)*100 is not.
+> sqrt50 is possible, sqrt(20+30) is not.
+
 The calculator is also able to parse parenthesis priority.
 You can mix and match different operands to create complex expressions, and the calculator will parse the request and solve it for you.
 e.g.: > (1*4)+%50*100 => 54
 ''')
         self.show_quit_tip()
 
-    def show_invalid_expression(self):
-        print("Invalid Expression")
+    def show_exception(self, e):
+        print(e)
