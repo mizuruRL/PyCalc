@@ -2,6 +2,7 @@ import ast
 import operator
 import util.parser as parser
 import util.ui as tui
+import util.exceptions as pe
 
 ops = {
         ast.Add: operator.add, 
@@ -19,7 +20,11 @@ ui.show_help_tip()
 ui.show_quit_tip()
 
 while True:
-    expr = ui.show_input_space()
+    try:
+        expr = ui.show_input_space()
+    except KeyboardInterrupt:
+        ui.show_terminated()
+        exit(0)
     if expr == "help":
         ui.show_help()
     elif expr == "quit":
@@ -27,10 +32,11 @@ while True:
         exit(0)
     else:
         try:
-            pexpr = prsr.prep_expression(expr)
-            print(">", prsr.calc_expression(pexpr))
-        except TypeError:
-            ui.show_invalid_expression()
-        except SyntaxError:
-            ui.show_invalid_expression()
-        
+            res = prsr.calc_expression(expr)
+            print(">", res)
+        except pe.InvalidExpressionException as e:
+            ui.show_exception(e)
+        except pe.InvalidElementException as e:
+            ui.show_exception(e)
+        except pe.InvalidSyntaxException as e:
+            ui.show_exception(e)
