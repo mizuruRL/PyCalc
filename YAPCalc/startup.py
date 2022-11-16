@@ -40,3 +40,5 @@ while True:
             ui.show_exception(e)
         except pe.InvalidSyntaxException as e:
             ui.show_exception(e)
+        except pe.DivisionByZeroException as e:
+            ui.show_exception(e)

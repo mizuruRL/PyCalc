@@ -9,3 +9,7 @@ class InvalidElementException(Exception):
 class InvalidSyntaxException(Exception):
     def __init__(self):
         Exception.__init__(self, f'Invalid syntax on expression')
+
+class DivisionByZeroException(Exception):
+    def __init__(self):
+        Exception.__init__(self, f'Zero division')

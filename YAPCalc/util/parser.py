@@ -24,7 +24,10 @@ class Parser:
         if isinstance(node, ast.Num):
             return node.n
         elif isinstance(node, ast.BinOp):
-            return self.ops[type(node.op)](self.calc_node(node.left), self.calc_node(node.right))
+            try:
+                return self.ops[type(node.op)](self.calc_node(node.left), self.calc_node(node.right))
+            except ZeroDivisionError:
+                raise pe.DivisionByZeroException()
         elif isinstance(node, ast.UnaryOp):
             return self.ops[type(node.op)](self.calc_node(node.operand))
         elif isinstance(node, ast.Name):
